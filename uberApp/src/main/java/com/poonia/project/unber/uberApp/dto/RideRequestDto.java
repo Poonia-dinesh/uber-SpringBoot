@@ -17,18 +17,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RideRequestDto {
-       private long id;
-    private Point pickupLocation;
-    private  Point dropoffLocation;
+       private Long id;
+
+    private PointDto pickupLocation;
+    private  PointDto dropOffLocation;
+    private PaymentMethod paymentMethod;
 
     private LocalDateTime requestedTime;
 
     private RiderDto rider;
 
-    private PaymentMethod paymentMethod;
-
-    @Enumerated(EnumType.STRING)
     private RideRequestStatus rideRequestStatus;
-
-
 }

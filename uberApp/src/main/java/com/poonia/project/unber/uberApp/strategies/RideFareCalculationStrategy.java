@@ -1,9 +1,12 @@
 package com.poonia.project.unber.uberApp.strategies;
 
 import com.poonia.project.unber.uberApp.dto.RideRequestDto;
+import com.poonia.project.unber.uberApp.entities.RideRequest;
 
 
 public interface RideFareCalculationStrategy {
-    double calculateFare(RideRequestDto rideRequestDto);
+
+    double RIDE_FARE_MULTIPLIER = 10;
+    double calculateFare(RideRequest rideRequest);
 
 }
