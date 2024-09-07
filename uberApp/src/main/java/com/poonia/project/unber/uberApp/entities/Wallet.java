@@ -8,7 +8,7 @@ import java.util.List;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  long id;
+    private  Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     private User user;

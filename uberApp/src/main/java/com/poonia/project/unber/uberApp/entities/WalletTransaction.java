@@ -16,7 +16,7 @@ public class WalletTransaction {
     private TransactionType transactionType;
     private TransactionMethod transactionMethod;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne()
     private  Ride ride;
 
     private  String transactionId;

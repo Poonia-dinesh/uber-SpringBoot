@@ -17,7 +17,7 @@ public class RideRequest {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   @Column(columnDefinition = "Geometry(Point, 4326)")
   private  Point pickupLocation;

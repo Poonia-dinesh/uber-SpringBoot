@@ -5,20 +5,21 @@ import com.poonia.project.unber.uberApp.dto.DriverDto;
 import com.poonia.project.unber.uberApp.dto.RideRequestDto;
 import com.poonia.project.unber.uberApp.entities.Driver;
 import com.poonia.project.unber.uberApp.entities.Ride;
+import com.poonia.project.unber.uberApp.entities.RideRequest;
 import com.poonia.project.unber.uberApp.entities.enums.RideStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 public interface RideService {
 
-    Ride getRideBy(Long rideId);
+    Ride getRideById(Long rideId);
 
 
     void matchWithDriver(RideRequestDto rideRequestDto);
 
-     Ride createNewRide(RideRequestDto rideRequestDto, Driver driver);
+     Ride createNewRide(RideRequest rideRequest, Driver driver);
 
-     Ride updateRideStatus(Long rideID, RideStatus rideStatus);
+     Ride updateRideStatus(Ride ride, RideStatus rideStatus);
 
 
      Page<Ride> getAllRidesOfRider(Long riderId, PageRequest pageRequest);

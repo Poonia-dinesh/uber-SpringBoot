@@ -6,7 +6,7 @@ import com.poonia.project.unber.uberApp.entities.RideRequest;
 
 public interface RideFareCalculationStrategy {
 
-    double RIDE_FARE_MULTIPLIER = 10;
+    double RIDE_FARE_MULTIPLIER = 10D;
     double calculateFare(RideRequest rideRequest);
 
 }
