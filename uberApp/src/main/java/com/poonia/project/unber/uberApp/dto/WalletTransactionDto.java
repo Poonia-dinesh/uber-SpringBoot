@@ -1,35 +1,23 @@
-package com.poonia.project.unber.uberApp.entities;
+package com.poonia.project.unber.uberApp.dto;
 
+import com.poonia.project.unber.uberApp.entities.Ride;
+import com.poonia.project.unber.uberApp.entities.Wallet;
 import com.poonia.project.unber.uberApp.entities.enums.TransactionMethod;
 import com.poonia.project.unber.uberApp.entities.enums.TransactionType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class WalletTransaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Data
+public class WalletTransactionDto {
     private Long id;
     private Double amount;
     private TransactionType transactionType;
     private TransactionMethod transactionMethod;
-
-    @ManyToOne()
-    private  Ride ride;
-
+    private RideDto ride;
     private  String transactionId;
-
-    @ManyToOne
-    private Wallet wallet;
-
-    @CreationTimestamp
+    private WalletDto wallet;
     private LocalDateTime timeStamp;
 }

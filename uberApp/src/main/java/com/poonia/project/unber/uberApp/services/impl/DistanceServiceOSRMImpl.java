@@ -22,11 +22,11 @@ public class DistanceServiceOSRMImpl implements DistanceService {
                    .baseUrl(OSRM_API_BASE_URL)
                    .build()
                    .get()
-                   //.uri("{},{};{},{}", src.getX(),src.getY(),dest.getX(),dest.getY())// Check here for any error
                    .uri(uri)
                    .retrieve()
                    .body(OSRMResponseDto.class);
 
+           //.uri("{},{};{},{}", src.getX(),src.getY(),dest.getX(),dest.getY())// Check here for any error
            // Distance converted from meters to Km.
            return responseDto.getRoutes().get(0).getDistance()/1000.0;
        } catch (Exception e){

@@ -9,6 +9,8 @@ import com.poonia.project.unber.uberApp.exceptions.RuntimeConflictException;
 import com.poonia.project.unber.uberApp.repositories.UserRepository;
 import com.poonia.project.unber.uberApp.services.AuthService;
 import com.poonia.project.unber.uberApp.services.RiderService;
+import com.poonia.project.unber.uberApp.services.WalletService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private  final ModelMapper modelMapper;
     private  final RiderService riderService;
+    private final WalletService walletService;
 
 
 
@@ -32,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public UserDto signup(SignupDto signupDto) {
     User user =  userRepository.findByEmail(signupDto.getEmail()).orElse(null);
     if(user !=null) {
@@ -44,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
         // create user related entities
 
       riderService.createNewRider(savedUser);
+      walletService.createNewWallet(savedUser);
 
       // TODO add wallet related services here
 

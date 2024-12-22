@@ -4,6 +4,7 @@ import com.poonia.project.unber.uberApp.dto.RideRequestDto;
 import com.poonia.project.unber.uberApp.entities.Driver;
 import com.poonia.project.unber.uberApp.entities.Ride;
 import com.poonia.project.unber.uberApp.entities.RideRequest;
+import com.poonia.project.unber.uberApp.entities.Rider;
 import com.poonia.project.unber.uberApp.entities.enums.RideRequestStatus;
 import com.poonia.project.unber.uberApp.entities.enums.RideStatus;
 import com.poonia.project.unber.uberApp.exceptions.ResourceNotFoundException;
@@ -58,13 +59,13 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public Page<Ride> getAllRidesOfRider(Long riderId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfRider(Rider rider, PageRequest pageRequest) {
+        return rideRepository.findByRider(rider, pageRequest);
     }
 
     @Override
-    public Page<Ride> getAllRidesOfDriver(Long driverId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfDriver(Driver driver, PageRequest pageRequest) {
+        return rideRepository.findByDriver(driver, pageRequest);
     }
 
     private  String generateRandomOtp (){

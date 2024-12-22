@@ -4,14 +4,14 @@ import com.poonia.project.unber.uberApp.dto.DriverDto;
 import com.poonia.project.unber.uberApp.dto.RideDto;
 import com.poonia.project.unber.uberApp.dto.RideRequestDto;
 import com.poonia.project.unber.uberApp.dto.RiderDto;
-import com.poonia.project.unber.uberApp.entities.Driver;
-import com.poonia.project.unber.uberApp.entities.RideRequest;
-import com.poonia.project.unber.uberApp.entities.Rider;
-import com.poonia.project.unber.uberApp.entities.User;
+import com.poonia.project.unber.uberApp.entities.*;
 import com.poonia.project.unber.uberApp.entities.enums.RideRequestStatus;
+import com.poonia.project.unber.uberApp.entities.enums.RideStatus;
 import com.poonia.project.unber.uberApp.exceptions.ResourceNotFoundException;
 import com.poonia.project.unber.uberApp.repositories.RideRequestRepository;
 import com.poonia.project.unber.uberApp.repositories.RiderRepository;
+import com.poonia.project.unber.uberApp.services.DriverService;
+import com.poonia.project.unber.uberApp.services.RideService;
 import com.poonia.project.unber.uberApp.services.RiderService;
 import com.poonia.project.unber.uberApp.strategies.DriverMatchingStrategy;
 import com.poonia.project.unber.uberApp.strategies.RideFareCalculationStrategy;
@@ -20,6 +20,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +35,8 @@ public class RiderSeriveImpl implements RiderService {
     private final RideStrategyManager rideStrategyManager;
     private final RideRequestRepository rideRequestRepository;
     private final RiderRepository riderRepository;
+    private final RideService rideService;
+    private final DriverService driverService;
 
     @Override
     @Transactional
@@ -41,10 +45,8 @@ public class RiderSeriveImpl implements RiderService {
         RideRequest rideRequest = modelMapper.map(rideRequestDto, RideRequest.class);
         rideRequest.setRideRequestStatus(RideRequestStatus.PENDING);
         rideRequest.setRider(rider);
-
         Double fare = rideStrategyManager.rideFareCalculationStrategy().calculateFare(rideRequest);
         rideRequest.setFare(fare);
-
        RideRequest savedRideRequest =  rideRequestRepository.save(rideRequest);
        List<Driver> drivers = rideStrategyManager.driverMatchingStrategy(rider.getRating()).findMatchingDriver(rideRequest);
 
@@ -53,7 +55,18 @@ public class RiderSeriveImpl implements RiderService {
 
     @Override
     public RideDto cancelRide(Long rideId) {
-        return null;
+        Rider rider = getCurrentRider();
+        Ride ride = rideService.getRideById(rideId);
+        if(!rider.equals(ride.getRider())){
+            throw new RuntimeException("Rider doesn't own this ride with ride Id: "+ rideId);
+        }
+        if(! ride.getReideStatus().equals(RideStatus.CONFIRMED)){
+            throw new RuntimeException("Ride cannot be cancelled: "+ride.getReideStatus());
+        }
+       Ride savedRide = rideService.updateRideStatus(ride, RideStatus.CANCELLED);
+     driverService.updateDriverAvailability(ride.getDriver(), true);
+
+     return modelMapper.map(savedRide, RideDto.class);
     }
 
     @Override
@@ -63,12 +76,16 @@ public class RiderSeriveImpl implements RiderService {
 
     @Override
     public RiderDto getMyProfile() {
-        return null;
+        Rider currentRider = getCurrentRider();
+        return modelMapper.map(currentRider, RiderDto.class);
     }
 
     @Override
-    public List<RideDto> getAllMyRides() {
-        return List.of();
+    public Page<RideDto> getAllMyRides(PageRequest pageRequest) {
+        Rider currentRider = getCurrentRider();
+        return rideService.getAllRidesOfRider(currentRider, pageRequest).map(
+                ride -> modelMapper.map(ride, RideDto.class)
+        );
     }
 
     @Override
@@ -80,7 +97,6 @@ public class RiderSeriveImpl implements RiderService {
 
     @Override
     public Rider getCurrentRider() {
-
         // TODO : impliment spring security
         return riderRepository.findById(1L).orElseThrow(()-> new ResourceNotFoundException("Rider Not Found with id: "+1));
     }
