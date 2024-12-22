@@ -10,10 +10,7 @@ import com.poonia.project.unber.uberApp.entities.enums.RideRequestStatus;
 import com.poonia.project.unber.uberApp.entities.enums.RideStatus;
 import com.poonia.project.unber.uberApp.exceptions.ResourceNotFoundException;
 import com.poonia.project.unber.uberApp.repositories.DriverRepository;
-import com.poonia.project.unber.uberApp.services.DriverService;
-import com.poonia.project.unber.uberApp.services.PaymentService;
-import com.poonia.project.unber.uberApp.services.RideRequestService;
-import com.poonia.project.unber.uberApp.services.RideService;
+import com.poonia.project.unber.uberApp.services.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,6 +29,7 @@ public class DriverServiceImpl implements DriverService {
     private  final RideService rideService;
     private final ModelMapper modelMapper;
     private final PaymentService paymentService;
+    private final RatingService ratingService;
 
     @Override
     @Transactional
@@ -84,6 +82,7 @@ public class DriverServiceImpl implements DriverService {
       Ride saveRide =  rideService.updateRideStatus(ride, RideStatus.ONGOING);
 
       paymentService.createNewPayment(saveRide);
+      ratingService.createNewRating(saveRide);
 
        return modelMapper.map(saveRide, RideDto.class);
     }
@@ -108,7 +107,15 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDto rateRider(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver = getCurrentDriver();
+        if(!driver.equals(ride.getDriver())){
+            throw new RuntimeException("Driver is not the owner of ride");
+        }
+        if(!ride.getReideStatus().equals(RideStatus.ENDED)){
+            new RuntimeException("Ride status is not ended hence cannot be rate"+ ride.getReideStatus());
+        }
+       return ratingService.rateRider(ride, rating);
     }
 
     @Override
@@ -137,6 +144,11 @@ public class DriverServiceImpl implements DriverService {
         driver.setAvailable(available);
         driverRepository.save(driver);
         return driver;
+    }
+
+    @Override
+    public Driver createDriver(Driver driver) {
+       return driverRepository.save(driver);
     }
 
 

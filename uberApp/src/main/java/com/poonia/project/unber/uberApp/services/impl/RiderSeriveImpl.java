@@ -11,6 +11,7 @@ import com.poonia.project.unber.uberApp.exceptions.ResourceNotFoundException;
 import com.poonia.project.unber.uberApp.repositories.RideRequestRepository;
 import com.poonia.project.unber.uberApp.repositories.RiderRepository;
 import com.poonia.project.unber.uberApp.services.DriverService;
+import com.poonia.project.unber.uberApp.services.RatingService;
 import com.poonia.project.unber.uberApp.services.RideService;
 import com.poonia.project.unber.uberApp.services.RiderService;
 import com.poonia.project.unber.uberApp.strategies.DriverMatchingStrategy;
@@ -37,6 +38,7 @@ public class RiderSeriveImpl implements RiderService {
     private final RiderRepository riderRepository;
     private final RideService rideService;
     private final DriverService driverService;
+    private  final RatingService ratingService;
 
     @Override
     @Transactional
@@ -71,7 +73,15 @@ public class RiderSeriveImpl implements RiderService {
 
     @Override
     public DriverDto rateDriver(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Rider rider = getCurrentRider();
+        if(!ride.equals(ride.getDriver())){
+            throw new RuntimeException("Rider is not the owner of ride");
+        }
+        if(!ride.getReideStatus().equals(RideStatus.ENDED)){
+            new RuntimeException("Ride status is not ended hence cannot be rate"+ ride.getReideStatus());
+        }
+        return ratingService.rateDriver(ride, rating);
     }
 
     @Override
