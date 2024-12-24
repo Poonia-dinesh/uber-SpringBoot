@@ -6,6 +6,7 @@ import com.poonia.project.unber.uberApp.dto.RiderDto;
 import com.poonia.project.unber.uberApp.entities.Driver;
 import com.poonia.project.unber.uberApp.entities.Ride;
 import com.poonia.project.unber.uberApp.entities.RideRequest;
+import com.poonia.project.unber.uberApp.entities.User;
 import com.poonia.project.unber.uberApp.entities.enums.RideRequestStatus;
 import com.poonia.project.unber.uberApp.entities.enums.RideStatus;
 import com.poonia.project.unber.uberApp.exceptions.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -134,13 +136,13 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public Driver getCurrentDriver() {
-        return driverRepository.findById(2L).orElseThrow(()->
-                new ResourceNotFoundException("Current driver not found with Id: " + 2));
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return driverRepository.findByUser(user).orElseThrow(()->
+                new ResourceNotFoundException("User is not associated as Driver with id : " + user.getId()));
     }
 
     @Override
     public Driver updateDriverAvailability(Driver driver, boolean available) {
-
         driver.setAvailable(available);
         driverRepository.save(driver);
         return driver;
@@ -150,6 +152,4 @@ public class DriverServiceImpl implements DriverService {
     public Driver createDriver(Driver driver) {
        return driverRepository.save(driver);
     }
-
-
 }
