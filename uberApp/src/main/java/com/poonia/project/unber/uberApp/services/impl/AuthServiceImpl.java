@@ -73,8 +73,6 @@ public class AuthServiceImpl implements AuthService {
 
       // TODO add wallet related services here
 
-
-
         return modelMapper.map(savedUser, UserDto.class);
     }
 
